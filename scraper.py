@@ -11,7 +11,10 @@ def findJob(url,linklist,origin):
     global outputFile
     global supercounter
     supercounter = supercounter + 1
-
+    if '.mp4' in url:
+        return
+    if '.zip' in url:
+        return
     try:
         r = requests.Session().get(url)
     except:
@@ -36,6 +39,10 @@ def findJob(url,linklist,origin):
             continue
         if '.pdf' in link:
             continue
+        if '.mp4' in link:
+            pass
+        if '.zip' in link:
+            pass
         if 'mailto' in link:
             continue
         if 'javascript:' in link:
@@ -62,11 +69,11 @@ def findJob(url,linklist,origin):
             findJob(fullLink,linklist,origin)
 
 inputFile = open('E:/output2.txt','r')
-outputFile = open('E:/jobs.txt', 'w')
+outputFile = open('E:/jobs2.txt', 'w')
 counter = 0
 supercounter = 0
 for line in inputFile:
-    if counter < 255:
+    if counter < 1078:
         counter = counter + 1
         continue
     print "Opening " + line
