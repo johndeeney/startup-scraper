@@ -2,29 +2,14 @@ import requests
 from urlparse import urljoin
 from pyquery import PyQuery as pq
 
-def findNewBase(url):
-    if '.' in url.split('/')[-1]:
-        return url[:(-1 * len(url.split('/')[-1]))].rstrip('/') + '/'
-    else:
-        return url.rstrip('/') + '/'
-
-def getNewLinkOld(url, link):
-        if link[0] == '/':
-            baseUrl = url.split('/')[0] + '//' + url.split('/')[2]
-            if baseUrl == '/':
-                fullLink = baseUrl + link[1:]
-            else:
-                fullLink = baseUrl + '/' + link[1:]
-        elif 'http' in link:
-            fullLink = link
-        else:
-            fullLink = findNewBase(url) + link
-        return fullLink
-
 def getNewLink(baseUrl, aTag):
+    """Returns a new link based on the original URL and the href link contained in the <a> tag"""
     return urljoin(baseUrl, aTag)
 
 def isValidLink(link,origin):
+    """Returns True if the link might go somewhere we want to look (e.g. .mp4 files and .zips will be useless.
+    Will not return True if it leads to an external website.
+    """
     if link is None or link == '':
         return False
     if '#' in link:
@@ -48,6 +33,7 @@ def isValidLink(link,origin):
     return True
 
 def containsInternship(r):
+    """Returns True, if the content contains any mention of intern or co-op, ignoring the words international and internet"""
     return ('intern' in r.content.lower() and \
            r.content.lower().count('internal') + r.content.lower().count('international') + r.content.lower().count('internet') != r.content.lower().count('intern'))\
            or 'co-op' in r.content.lower()
@@ -88,25 +74,29 @@ def findJob(url,linklist,origin,depth):
             linklist.append(fullLink)
             findJob(fullLink,linklist,origin,depth + 1)
 
-inputFile = open('E:/output2.txt','r')
+with open('E:/output2.txt','r') as inputFile:
+    websites = inputFile.read().splitlines()
 outputFile = open('E:/jobs4.txt', 'w')
+try:
+    with open('visited_sites.txt','r') as visitedFile:
+        visitedSites = visitedFile.read()
+except:
+    visitedSites = "" 
 counter = 0
 supercounter = 0
-for line in inputFile:
-    counter = counter + 1
-    if counter < 5:
+print websites[4]
+for website in websites:
+    if website in visitedSites:
         continue
-    print "Opening " + line
-    original = line
+    print "Opening " + website
+    original = website
     try:
         supercounter = 0
-        findJob(line,[],original,1)
+        findJob(website,[],original,1)
     except Exception as inst:
-        print 'Error for some reason at ' + line
+        print 'Error for some reason at ' + website
         print inst
-    if counter % 1 == 0:
-        print "reopening file..."
-        outputFile.close()
-        outputFile = open('E:/jobs4.txt', 'a')
+    outputFile.close()
+    outputFile = open('E:/jobs4.txt', 'a')
 inputFile.close();
 outputFile.close();
