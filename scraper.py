@@ -40,13 +40,10 @@ def containsInternship(r):
            
 
 def findJob(url,linklist,origin,depth):
+    """Finds and saves all links with content relating to internships to a text file"""
     global outputFile
     global supercounter
     supercounter = supercounter + 1
-    if '.mp4' in url:
-        return
-    if '.zip' in url:
-        return
     try:
         r = requests.Session().get(url)
     except:
@@ -58,7 +55,8 @@ def findJob(url,linklist,origin,depth):
     l = list(e('a').items())
     if containsInternship(r):
         print "Intern at: " + r.url
-        outputFile.write(r.url + "\n")
+        with open('internships.txt','a') as outputFile:
+            outputFile.write(r.url + '\n')
     if supercounter > 30:
         print str(supercounter) + " tries initiatied.  Switching to next website."
         return
@@ -69,23 +67,21 @@ def findJob(url,linklist,origin,depth):
         if not isValidLink(link, origin):
             continue
         fullLink = getNewLink(r.url, link)
-        if fullLink not in linklist and 'facebook.com' not in fullLink and 'twitter.com' not in fullLink and 'linkedin.com' not in fullLink:
+        if fullLink not in linklist and 'facebook.com' not in fullLink \
+           and 'twitter.com' not in fullLink and 'linkedin.com' not in fullLink:
             print fullLink
             linklist.append(fullLink)
             findJob(fullLink,linklist,origin,depth + 1)
 
-with open('E:/output2.txt','r') as inputFile:
+with open('startup_websites.txt','r') as inputFile:
     websites = inputFile.read().splitlines()
-outputFile = open('E:/jobs4.txt', 'w')
 try:
     with open('visited_sites.txt','r') as visitedFile:
         visitedSites = visitedFile.read()
 except:
     visitedSites = "" 
-counter = 0
-supercounter = 0
-print websites[4]
-for website in websites:
+supercounter = 0 #global variable for determining if there has been too many tries on
+for website in websites:                                                #this website
     if website in visitedSites:
         continue
     print "Opening " + website
@@ -96,7 +92,7 @@ for website in websites:
     except Exception as inst:
         print 'Error for some reason at ' + website
         print inst
-    outputFile.close()
-    outputFile = open('E:/jobs4.txt', 'a')
+    with open('visited_sites.txt','a') as visitedFile:  #opens an closes every time
+        visitedFile.write(website + '\n')       #in case program stops unexpectedly
 inputFile.close();
 outputFile.close();
