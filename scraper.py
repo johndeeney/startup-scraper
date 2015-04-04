@@ -32,11 +32,11 @@ def isValidLink(link,origin):
         return False
     return True
 
-def containsInternship(r):
+def containsInternship(content):
     """Returns True, if the content contains any mention of intern or co-op, ignoring the words international and internet"""
-    return ('intern' in r.content.lower() and \
-           r.content.lower().count('internal') + r.content.lower().count('international') + r.content.lower().count('internet') != r.content.lower().count('intern'))\
-           or 'co-op' in r.content.lower()
+    return ('intern' in content and \
+           content.count('internal') + content.count('international') + content.count('internet') != content.count('intern'))\
+           or 'co-op' in content
            
 
 def findJob(url,linklist,origin,depth):
@@ -53,7 +53,7 @@ def findJob(url,linklist,origin,depth):
     except:
         return
     l = list(e('a').items())
-    if containsInternship(r):
+    if containsInternship(r.content.lower()):
         print "Intern at: " + r.url
         with open('internships.txt','a') as outputFile:
             outputFile.write(r.url + '\n')
@@ -94,5 +94,3 @@ for website in websites:                                                #this we
         print inst
     with open('visited_sites.txt','a') as visitedFile:  #opens an closes every time
         visitedFile.write(website + '\n')       #in case program stops unexpectedly
-inputFile.close();
-outputFile.close();
